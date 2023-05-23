@@ -27,9 +27,60 @@ const movies = [
   },
 ];
 
+// const getMovies = (req, res) => {
+//   const initialSql = "select * from movies";
+//   const where = [];
+
+//   if (req.query.color != null) {
+//     where.push({
+//       column: "color",
+//       value: req.query.color,
+//       operator: "=",
+//     });
+//   }
+//   if (req.query.max_duration != null) {
+//     where.push({
+//       column: "duration",
+//       value: req.query.max_duration,
+//       operator: "<=",
+//     });
+//   }
+
+//   database
+//     .query(
+//       where.reduce(
+//         (sql, { column, operator }, index) =>
+//           `${sql} ${index === 0 ? "where" : "and"} ${column} ${operator} ?`,
+//         initialSql
+//       ),
+//       where.map(({ value }) => value)
+//     )
+//     .then(([movies]) => {
+//       res.json(movies);
+//     })
+//     .catch((err) => {
+//       console.error(err);
+//       res.status(500).send("Error retrieving data from database");
+//     });
+// };
 const getMovies = (req, res) => {
+  let sql = "select * from movies";
+  const sqlValues = [];
+
+  if (req.query.color != null) {
+    sql += " where color = ?";
+    sqlValues.push(req.query.color);
+
+    if (req.query.max_duration != null) {
+      sql += " and duration <= ?";
+      sqlValues.push(req.query.max_duration);
+    }
+  } else if (req.query.max_duration != null) {
+    sql += " where duration <= ?";
+    sqlValues.push(req.query.max_duration);
+  }
   database
-    .query("select * from movies")
+    .query(sql, sqlValues)
     .then(([movies]) => {
       res.json(movies);
     })
@@ -56,11 +107,6 @@ const getMovieById = (req, res) => {
       res.status(500).send("Error retrieving data from database");
     });
 };
-
-// const postMovies = (req, res) => {
-//   console.log(req.body);
-//   res.send("Post route is working 🎉");
-// };
 
 const postMovie = (req, res) => {
   const { title, director, year, color, duration } = req.body;
@@ -120,6 +166,11 @@ const deleteMovie = (req, res) => {
     });
 };
 
+// const postMovies = (req, res) => {
+//   console.log(req.body);
+//   res.send("Post route is working 🎉");
+// };
+
 // const movie = movies.find((movie) => movie.id === id);
 
 // if (movie != null) {
@@ -127,6 +178,34 @@ const deleteMovie = (req, res) => {
 // } else {
 //   res.status(404).send("Not Found");
 // }
+
+// const getMovies = (req, res) => {
+//   let sql = "select * from movies";
+//   const sqlValues = [];
+
+//   if (req.query.color != null) {
+//     sql += "where color = ?";
+//     sqlValues.push(req.query.color);
+
+//     if (req.QUERY.duration != null) {
+//       max_duration += "where duration <= ?";
+//       sqlValues.push(req.query.duration);
+//     }
+//   } else if (req.QUERY.duration != null) {
+//     max_duration += "where duration <= ?";
+//     sqlValues.push(req.query.duration);
+//   }
+
+//   database
+//     .query(sql, sqlValues)
+//     .then(([movies]) => {
+//       res.json(movies);
+//     })
+//     .catch((err) => {
+//       console.error(err);
+//       res.status(500).send("Error retrieving data from database");
+//     });
+// };
 
 module.exports = {
   getMovies,
