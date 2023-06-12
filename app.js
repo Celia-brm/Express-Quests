@@ -6,6 +6,7 @@ app.use(express.json());
 
 const movieHandlers = require("./movieHandlers");
 const usersHandlers = require("./usersHandlers");
+const { hashPassword } = require("./auth.js");
 
 const welcome = (req, res) => {
   res.send("Welcome to my favourite movie list");
@@ -19,9 +20,9 @@ app.put("/api/movies/:id", movieHandlers.putMovie);
 app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 
 app.get("/api/users", usersHandlers.getUsers);
-app.get("/api/users/:id", usersHandlers.getUsersById);
-app.post("/api/users", usersHandlers.postUser);
-app.put("/api/users/:id", usersHandlers.putUser);
+app.get("/api/users/:id", usersHandlers.updateUser);
+app.post("/api/users", hashPassword, usersHandlers.postUser);
+app.put("/api/users/:id", hashPassword, usersHandlers.updateUser);
 app.delete("/api/users/:id", usersHandlers.deleteUser);
 
 app.listen(port, (err) => {
